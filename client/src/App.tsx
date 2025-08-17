@@ -16,23 +16,24 @@ import type { Employee } from './types';
 const App: React.FC = () => {
   const [appLoaded, setAppLoaded] = useState(false)
   const [currentUser, setCurrentUser] = useState<Employee>(undefined as any)
-  const { setCurrentUser: _setCurrentUser } = useEmployeeStore();
+  const { setCurrentUser: _setCurrentUser, fetchEmployees } = useEmployeeStore();
 
   useEffect(() => {
     const user = localStorage.getItem('userInfo')
     if(user) {
       _setCurrentUser(JSON.parse(user))
       setCurrentUser(JSON.parse(user))
-      setTimeout(() => {
-        setAppLoaded(true)
-      }, 500);
+      fetchEmployees()
     }
+    setTimeout(() => {
+      setAppLoaded(true)
+    }, 500);
   }, [])
   if(!appLoaded) {
     return <p>Loading ...</p>
   }
   return (
-    <Router>
+    <Router basename='/resturant'>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         

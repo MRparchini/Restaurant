@@ -8,5 +8,8 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
-  base: 'resturant'
+  base: 'resturant',
+  server: {
+    host: "0.0.0.0"
+  }
 })

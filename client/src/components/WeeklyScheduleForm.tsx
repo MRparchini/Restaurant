@@ -98,6 +98,7 @@ const WeeklyScheduleForm: React.FC = () => {
         Save Weekly Schedule
       </button>
 
+      <div className="overflow-x-auto">
       <table className="min-w-full bg-white border">
         <thead>
           <tr>
@@ -166,6 +167,7 @@ const WeeklyScheduleForm: React.FC = () => {
           ))}
         </tbody>
       </table>
+</div>
     </div>
   );
 };

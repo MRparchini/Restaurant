@@ -11,7 +11,7 @@ const ShiftsList: React.FC = () => {
   useEffect(() => {
     fetchShifts()
   }, [])
-  
+
   const shifts = getShiftsByTab(activeTab);
 
   return (
@@ -31,10 +31,31 @@ const ShiftsList: React.FC = () => {
       {loading && <div>Loading shifts...</div>}
       {error && <div className="text-red-500">Error: {error}</div>}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {shifts.map(shift => (
-          <ShiftCard key={shift.id} shift={shift} />
-        ))}
+
+      <div className="overflow-x-auto">
+      {(!loading && shifts.length > 0) && <table className="bg-white border">
+
+        <thead>
+          <tr>
+            <th className="border w-[200px]">Employee</th> {/* Fixed pixel width */}
+            <th className="border w-[100px]">Shift Date</th>
+            <th className="border w-[90px]">Start Time</th>
+            <th className="border w-[90px]">End Time</th>
+            <th className="border">Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          {shifts.map(shift => (
+            <tr>
+              <td className="border p-2">{shift.user_name}</td>
+              <td className="border p-2">{shift.shift_date}</td>
+              <td className="border p-2">{shift.start_time}</td>
+              <td className="border p-2">{shift.end_time}</td>
+              <td className="border p-2">{shift.position}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>}
       </div>
 
       {!loading && shifts.length === 0 && (
