@@ -29,13 +29,17 @@ const App: React.FC = () => {
       setAppLoaded(true)
     }, 500);
   }, [])
+  console.log("NNNN: ", currentUser)
   if(!appLoaded) {
     return <p>Loading ...</p>
   }
+
+  if(!currentUser) {
+    return <LoginPage />
+  }
   return (
-    <Router basename='/resturant'>
+    <Router basename='resturant'>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
         
         {currentUser ? (
           <Route path="/" element={<Layout />}>
@@ -52,7 +56,7 @@ const App: React.FC = () => {
             <Route path="employees/add" element={<EmployeeForm />} />
           </Route>
         ) : (
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<p>Shifts</p>} />
         )}
       </Routes>
     </Router>

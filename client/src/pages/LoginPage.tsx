@@ -1,6 +1,5 @@
 // src/pages/LoginPage.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useEmployeeStore } from '../store/useEmployeeStore';
 
 const LoginPage: React.FC = () => {
@@ -8,8 +7,7 @@ const LoginPage: React.FC = () => {
     user_name: '',
     password: ''
   });
-  const { login } = useEmployeeStore();
-  const navigate = useNavigate();
+  const { login, setCurrentUser } = useEmployeeStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,7 +20,11 @@ const LoginPage: React.FC = () => {
       const user = await login(credentials.user_name, credentials.password);
       if (user) {
         localStorage.setItem("userInfo", JSON.stringify(user))
-        navigate(user.role === 'admin' ? '/admin' : '/shifts');
+        setCurrentUser(user)
+        setTimeout(() => {
+          window.location.href = (user.role === 'admin' ? '/admin' : '/shifts');
+          window.location.reload()
+        }, 500);
       }
     } catch (error) {
       alert('Login failed: ' + (error instanceof Error ? error.message : 'Unknown error'));

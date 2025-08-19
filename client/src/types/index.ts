@@ -34,6 +34,7 @@ export interface LeaveRequest {
 }
 
 export interface WeeklySchedule {
+  shift_index: number;
   user_id: string;
   user_name: string;
   shifts: {

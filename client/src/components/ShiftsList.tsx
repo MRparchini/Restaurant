@@ -1,15 +1,19 @@
 // src/components/ShiftsList.tsx
 import React, { useEffect, useState } from 'react';
 import { type ShiftTab } from '../types';
-import ShiftCard from './ShiftCard';
 import { useShiftStore } from '../store/useShiftsStore';
+import { addDays, startOfWeek } from 'date-fns';
 
 const ShiftsList: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ShiftTab>('today');
   const { fetchShifts, getShiftsByTab, loading, error } = useShiftStore();
 
   useEffect(() => {
-    fetchShifts()
+    const today = new Date();
+    
+            const weekStart = startOfWeek(today).toDateString();
+            const weekEnd = addDays(weekStart, 6).toDateString();
+    fetchShifts(weekStart, weekEnd)
   }, [])
 
   const shifts = getShiftsByTab(activeTab);
