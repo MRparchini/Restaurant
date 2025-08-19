@@ -1,15 +1,12 @@
 // src/components/Layout.tsx
-import React from 'react';
-import { Link, Outlet, useNavigate } from 'react-router';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router';
 import { useEmployeeStore } from '../store/useEmployeeStore';
+import Sidebar from './Sidebar';
 
 const Layout: React.FC = () => {
   const { currentUser } = useEmployeeStore();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate('/login');
-  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (!currentUser) return null;
 
@@ -17,24 +14,19 @@ const Layout: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-blue-600 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex space-x-4">
-            <Link to="/shifts" className="hover:underline">Shifts</Link>
-            {currentUser.role === 'admin' && (
-              <>
-                <Link to="/schedule" className="hover:underline">Schedule</Link>
-                <Link to="/admin" className="hover:underline">Admin</Link>
-              </>
-            )}
-            <Link to="/leaves" className="hover:underline">Leave Requests</Link>
-          </div>
+          <button
+            aria-label="Open menu"
+            className="p-2 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-white"
+            onClick={() => setIsSidebarOpen(true)}
+          >
+            <span className="sr-only">Open menu</span>
+            {/* Hamburger icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <div className="flex items-center space-x-4">
             <span>Hello, {currentUser.full_name}</span>
-            <button 
-              onClick={handleLogout}
-              className="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100"
-            >
-              Logout
-            </button>
           </div>
         </div>
       </nav>
@@ -42,6 +34,8 @@ const Layout: React.FC = () => {
       <main className="container mx-auto p-4">
         <Outlet />
       </main>
+
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </div>
   );
 };

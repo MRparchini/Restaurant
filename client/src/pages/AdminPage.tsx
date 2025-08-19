@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { useEmployeeStore } from '../store/useEmployeeStore';
 
 const AdminPage: React.FC = () => {
-  const { employees, fetchEmployees, loading, error, currentUser } = useEmployeeStore();
+  const { employees, fetchEmployees, loading, error, currentUser, deleteEmployee } = useEmployeeStore();
 
   useEffect(() => {
     fetchEmployees();
@@ -55,7 +55,14 @@ const AdminPage: React.FC = () => {
                 <td className="border p-2">{employee.email}</td>
                 <td className="border p-2">{employee.phone}</td>
                 <td className="border p-2">
-                  <button className="text-red-500 hover:underline">
+                  <button
+                    className="text-red-500 hover:underline"
+                    onClick={async () => {
+                      if (window.confirm('Are you sure you want to delete this employee?')) {
+                        await deleteEmployee(employee.id);
+                      }
+                    }}
+                  >
                     Delete
                   </button>
                 </td>

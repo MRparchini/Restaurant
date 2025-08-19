@@ -53,6 +53,7 @@ const App: React.FC = () => {
             <Route path="schedule" element={<WeeklyScheduleForm />} />
             <Route path="leaves" element={<LeaveRequestForm />} />
             <Route path="admin" element={<AdminPage />} />
+            <Route path="employees" element={<AdminPage />} />
             <Route path="employees/add" element={<EmployeeForm />} />
           </Route>
         ) : (
