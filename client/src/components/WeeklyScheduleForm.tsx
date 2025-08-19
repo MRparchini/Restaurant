@@ -29,6 +29,7 @@ const WeeklyScheduleForm: React.FC = () => {
     employees.forEach((emp, i) => {
       let shiftPyload = {
         shift_index: i,
+        position: 1,
         user_id: emp.id,
         user_name: emp.full_name,
         shifts: {},
@@ -54,12 +55,14 @@ const WeeklyScheduleForm: React.FC = () => {
       if(field === "user_id") {
         newSchedule[shift_index].user_id = value
       }
+      else if(field === "position") {
+        newSchedule[shift_index].position = value as any
+      }
       else {
         if (!newSchedule[shift_index].shifts[date]) {
           newSchedule[shift_index].shifts[date] = {
             start_time: '',
             end_time: '',
-            position: ''
           };
         }
         newSchedule[shift_index].shifts[date]![field] = value;
@@ -68,6 +71,22 @@ const WeeklyScheduleForm: React.FC = () => {
     });
   };
 
+  
+  const calc_duration = (st: string, et: string) => {    
+        // Parse "HH:mm"
+        const [startHour, startMinute] = st.split(':').map(Number);
+        const [endHour, endMinute] = et.split(':').map(Number);
+
+        let start = startHour * 60 + startMinute;
+        let end = endHour * 60 + endMinute;
+
+        // If end is less than start, assume overnight shift (add 24h)
+        if (end < start) {
+          end += 24 * 60;
+        }
+
+        return end - start;
+  }
   const handlerota_hoursChange = (shift_index: number) => {
     const target = schedule[shift_index];
     if (!target) return 0;
@@ -83,19 +102,7 @@ const WeeklyScheduleForm: React.FC = () => {
         shift.start_time.length === 5 &&
         shift.end_time.length === 5
       ) {
-        // Parse "HH:mm"
-        const [startHour, startMinute] = shift.start_time.split(':').map(Number);
-        const [endHour, endMinute] = shift.end_time.split(':').map(Number);
-
-        let start = startHour * 60 + startMinute;
-        let end = endHour * 60 + endMinute;
-
-        // If end is less than start, assume overnight shift (add 24h)
-        if (end < start) {
-          end += 24 * 60;
-        }
-
-        totalMinutes += end - start;
+        totalMinutes += calc_duration(shift.start_time, shift.end_time)
       }
     });
 
@@ -138,7 +145,7 @@ const WeeklyScheduleForm: React.FC = () => {
       </button>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full table-fixed bg-white border">
+        <table className=" bg-white border" style={{width: "max-content"}}>
           <thead>
             <tr>
               <th className="border p-2  w-[200px]">Employee</th>
@@ -159,7 +166,19 @@ const WeeklyScheduleForm: React.FC = () => {
                   {employees.map(emp => (
                     <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                   ))}
-                  </select></td>
+                  </select>
+                  
+                          <select
+                            value={schedule[record.shift_index]?.position || ''}
+                            onChange={(e) => handleShiftChange(record.shift_index, "", 'position', e.target.value)}
+                            className="w-full p-1 border rounded"
+                          >
+                            <option value="">Select Position</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Cashier">Cashier</option>
+                            <option value="Barista">Barista</option>
+                          </select>
+                  </td>
                   
                 {weekDays.map(day => {
                   const dateStr = format(day, 'yyyy-MM-dd');
@@ -176,37 +195,37 @@ const WeeklyScheduleForm: React.FC = () => {
                               type="time"
                               value={schedule[record.shift_index]?.shifts[dateStr]?.start_time || ''}
                               onChange={(e) => handleShiftChange(record.shift_index, dateStr, 'start_time', e.target.value)}
-                              className="w-full p-1 border rounded"
+                              className="w-full border rounded "
                             />
                             <input
                               type="time"
                               value={schedule[record.shift_index]?.shifts[dateStr]?.end_time || ''}
                               onChange={(e) => handleShiftChange(record.shift_index, dateStr, 'end_time', e.target.value)}
-                              className="w-full p-1 border rounded"
+                              className="w-full border rounded "
                             />
                           </div>
-                          <select
-                            value={schedule[record.shift_index]?.shifts[dateStr]?.position || ''}
-                            onChange={(e) => handleShiftChange(record.shift_index, dateStr, 'position', e.target.value)}
-                            className="w-full p-1 border rounded"
-                          >
-                            <option value="">Select Position</option>
-                            <option value="Manager">Manager</option>
-                            <option value="Cashier">Cashier</option>
-                            <option value="Barista">Barista</option>
-                          </select>
+                          <div className="dayDuration text-center text-sm">{
+                          (
+                            schedule[record.shift_index]?.shifts[dateStr]?.start_time?.length === 5 &&
+                            schedule[record.shift_index]?.shifts[dateStr]?.end_time?.length === 5
+                          ) ?
+                          (+(calc_duration(
+                            schedule[record.shift_index]?.shifts[dateStr]?.start_time || "0",
+                            schedule[record.shift_index]?.shifts[dateStr]?.end_time || "0",
+                            )) / 60).toFixed(2) : "0"}</div>
                         </div>
                       )}
                     </td>
                   );
                 })}
-                <td className="border p-2 w-[400px]">
-                  <input
+                <td className="border text-center p-2 w-[100px]">
+                  {handlerota_hoursChange(record.shift_index)}
+                  {/* <input
                     type="number"
-                    value={handlerota_hoursChange(record.shift_index)}
+                    value={}
                     className="w-full p-1 border rounded"
                     min="0"
-                  />
+                  /> */}
                 </td>
 
               </tr>
