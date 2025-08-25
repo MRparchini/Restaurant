@@ -8,8 +8,11 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+<<<<<<< HEAD
   base: 'resturant',
   server: {
     host: "0.0.0.0"
   }
+=======
+>>>>>>> parent of e576f00 (add gh-pages)
 })
