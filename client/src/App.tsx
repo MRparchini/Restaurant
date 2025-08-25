@@ -38,7 +38,11 @@ const App: React.FC = () => {
     return <LoginPage />
   }
   return (
+<<<<<<< HEAD
     <Router basename='resturant'>
+=======
+    <Router basename='/resturant'>
+>>>>>>> 63898c3 (debug schedule table and login page)
       <Routes>
         
         {currentUser ? (
