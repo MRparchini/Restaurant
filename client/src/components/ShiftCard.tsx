@@ -3,8 +3,8 @@ import React from 'react';
 import { format, parseISO } from 'date-fns';
 import { type Shift } from '../types';
 import { Link } from 'react-router';
-import { useEmployeeStore } from '../store/useEmployeeStore';
-import { useShiftStore } from '../store/useShiftsStore';
+import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import { useShiftStore } from '../store/localStorage/useShiftsStore';
 
 interface ShiftCardProps {
   shift: Shift;

@@ -1,7 +1,7 @@
 // src/components/ShiftsList.tsx
 import React, { useEffect, useState } from 'react';
 import { type ShiftTab } from '../types';
-import { useShiftStore } from '../store/useShiftsStore';
+import { useShiftStore } from '../store/localStorage/useShiftsStore';
 import { addDays, startOfWeek } from 'date-fns';
 
 const ShiftsList: React.FC = () => {
@@ -21,7 +21,7 @@ const ShiftsList: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex border-b mb-4">
-        {(['today', 'week', 'upcoming'] as ShiftTab[]).map(tab => (
+        {(['today', 'week'] as ShiftTab[]).map(tab => (
           <button
             key={tab}
             className={`px-4 py-2 ${activeTab === tab ? 'border-b-2 border-blue-500 font-bold' : ''}`}

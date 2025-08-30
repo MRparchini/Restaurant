@@ -1,7 +1,7 @@
 // src/components/EmployeeForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useEmployeeStore } from '../store/useEmployeeStore';
+import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
 
 const EmployeeForm: React.FC = () => {
   const [formData, setFormData] = useState({

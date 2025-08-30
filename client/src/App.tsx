@@ -8,10 +8,14 @@ import ShiftsList from './components/ShiftsList';
 import WeeklyScheduleForm from './components/WeeklyScheduleForm';
 import EmployeeForm from './components/EmployeeForm';
 import LeaveRequestForm from './components/LeaveRequestForm';
-import { useEmployeeStore } from './store/useEmployeeStore';
+import { useEmployeeStore } from './store/localStorage/useEmployeeStore';
 import EditShiftPage from './pages/EditShiftPage';
 import './App.css'
 import type { Employee } from './types';
+// Import seed data to initialize IndexedDB
+import './store/localStorage/seedData';
+// Import database utilities for debugging
+import './store/localStorage/dbUtils';
 
 const App: React.FC = () => {
   const [appLoaded, setAppLoaded] = useState(false)

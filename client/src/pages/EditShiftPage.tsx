@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { type Shift } from '../types';
-import { useEmployeeStore } from '../store/useEmployeeStore';
-import { useShiftStore } from '../store/useShiftsStore';
+import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import { useShiftStore } from '../store/localStorage/useShiftsStore';
 
 const EditShiftPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +34,7 @@ const EditShiftPage = () => {
       }
     } else {
       // If no shifts loaded, fetch them first
-      fetchShifts().then(() => {
+      fetchShifts(new Date().toISOString(), new Date().toISOString()).then(() => {
         const shiftToEdit = shifts.find((shift: Shift) => shift.id === id);
         if (shiftToEdit) {
           const { id: _, created_at: __, ...rest } = shiftToEdit;
