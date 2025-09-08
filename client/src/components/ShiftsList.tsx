@@ -1,7 +1,7 @@
 // src/components/ShiftsList.tsx
 import React, { useEffect, useState } from 'react';
 import { type ShiftTab } from '../types';
-import { useShiftStore } from '../store/localStorage/useShiftsStore';
+import useShiftStore from '../store/useShiftsStore';
 import { addDays, startOfWeek } from 'date-fns';
 
 const ShiftsList: React.FC = () => {

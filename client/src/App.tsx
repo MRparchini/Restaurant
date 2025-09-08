@@ -8,7 +8,7 @@ import ShiftsList from './components/ShiftsList';
 import WeeklyScheduleForm from './components/WeeklyScheduleForm';
 import EmployeeForm from './components/EmployeeForm';
 import LeaveRequestForm from './components/LeaveRequestForm';
-import { useEmployeeStore } from './store/localStorage/useEmployeeStore';
+import useEmployeeStore from './store/useEmployeeStore';
 import EditShiftPage from './pages/EditShiftPage';
 import './App.css'
 import type { Employee } from './types';

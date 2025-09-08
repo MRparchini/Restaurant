@@ -1,7 +1,7 @@
 // src/components/Sidebar.tsx
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import useEmployeeStore from '../store/useEmployeeStore';
 
 interface SidebarProps {
   isOpen: boolean;
