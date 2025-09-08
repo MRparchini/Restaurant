@@ -49,3 +49,25 @@ export interface WeeklySchedule {
 
 export type ShiftTab = 'today' | 'week' | 'upcoming';
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+export interface EmployeeContract {
+  id: string;
+  user_id: string;
+  start_date: string; // ISO yyyy-MM-dd
+  end_date: string;   // ISO yyyy-MM-dd
+  hours_per_week: number;
+  days_per_week: number;
+  created_at: string; // ISO
+}
+
+export interface AnnualLeaveEntitlement {
+  id: string;
+  user_id: string;
+  contract_id: string;
+  leave_year_start: string; // ISO yyyy-MM-dd
+  leave_year_end: string;   // ISO yyyy-MM-dd
+  entitlement_hours: number;
+  entitlement_days: number;
+  calculation_basis: 'hours_per_week_5_6_pro_rata';
+  created_at: string;
+}

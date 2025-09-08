@@ -1,7 +1,7 @@
 // src/store/indexedDB.ts
 export class IndexedDBManager {
   private dbName = 'RestaurantAppDB';
-  private version = 1;
+  private version = 2;
   private db: IDBDatabase | null = null;
 
   async init(): Promise<void> {
@@ -35,6 +35,20 @@ export class IndexedDBManager {
           const leaveStore = db.createObjectStore('leave_requests', { keyPath: 'id' });
           leaveStore.createIndex('user_id', 'user_id', { unique: false });
           leaveStore.createIndex('status', 'status', { unique: false });
+        }
+
+        // New stores for annual leave
+        if (!db.objectStoreNames.contains('employee_contracts')) {
+          const contractStore = db.createObjectStore('employee_contracts', { keyPath: 'id' });
+          contractStore.createIndex('user_id', 'user_id', { unique: false });
+          contractStore.createIndex('created_at', 'created_at', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains('annual_leave_entitlements')) {
+          const entitlementStore = db.createObjectStore('annual_leave_entitlements', { keyPath: 'id' });
+          entitlementStore.createIndex('user_id', 'user_id', { unique: false });
+          entitlementStore.createIndex('contract_id', 'contract_id', { unique: false });
+          entitlementStore.createIndex('leave_year_start', 'leave_year_start', { unique: false });
         }
       };
     });
