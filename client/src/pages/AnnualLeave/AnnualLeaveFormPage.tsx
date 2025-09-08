@@ -13,11 +13,11 @@ interface ContractForm {
 
 export default function AnnualLeaveFormPage() {
   const { employees, fetchEmployees } = useEmployeeStore();
-  const { fetchLatestContractByUser, upsertContract, calculateAndSaveEntitlement, loading, error } = useAnnualLeaveStore();
+  const { fetchLatestContractByUser, upsertContract, calculateEntitlement, calculateAndSaveEntitlement, loading, error } = useAnnualLeaveStore();
 
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [leaveYearStart, setLeaveYearStart] = useState<string>('');
-  const [leaveYearEnd, setLeaveYearEnd] = useState<string>('');
+  // const [leaveYearStart, setLeaveYearStart] = useState<string>('');
+  // const [leaveYearEnd, setLeaveYearEnd] = useState<string>('');
 
   const [form, setForm] = useState<ContractForm>({
     user_id: '',
@@ -35,7 +35,16 @@ export default function AnnualLeaveFormPage() {
     if (!selectedUserId) return;
     (async () => {
       const latest = await fetchLatestContractByUser(selectedUserId);
+      console.log("latest: ", latest)
       if (latest) {
+        
+    const res = await calculateEntitlement({
+      user_id: selectedUserId,
+      contract_id: latest.id,
+      // leave_year_start: leaveYearStart,
+      // leave_year_end: leaveYearEnd,
+    });
+    console.log("RESSS:, ", res)
         setForm({
           id: latest.id,
           user_id: latest.user_id,
@@ -64,7 +73,7 @@ export default function AnnualLeaveFormPage() {
     e.preventDefault();
     if (!selectedUserId) return;
     if (!form.start_date || !form.end_date) return;
-    if (!leaveYearStart || !leaveYearEnd) return;
+    // if (!leaveYearStart || !leaveYearEnd) return;
 
     const saved = await upsertContract({
       id: form.id,
@@ -75,11 +84,19 @@ export default function AnnualLeaveFormPage() {
       days_per_week: form.days_per_week,
     });
 
+    const res = await calculateEntitlement({
+      user_id: selectedUserId,
+      contract_id: saved.id,
+      // leave_year_start: leaveYearStart,
+      // leave_year_end: leaveYearEnd,
+    });
+    console.log("RES: ", res)
+    return
     await calculateAndSaveEntitlement({
       user_id: selectedUserId,
       contract_id: saved.id,
-      leave_year_start: leaveYearStart,
-      leave_year_end: leaveYearEnd,
+      // leave_year_start: leaveYearStart,
+      // leave_year_end: leaveYearEnd,
     });
     // Optionally show a toast or message; keeping it simple here
     alert('Entitlement calculated and saved');
@@ -92,7 +109,11 @@ export default function AnnualLeaveFormPage() {
 
       <div style={{ marginBottom: 16 }}>
         <label>Employee</label>
-        <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} style={{ display: 'block', width: '100%', padding: 8 }}>
+        <select 
+        value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} 
+        className="w-full p-1 border rounded"
+        // style={{ display: 'block', width: '100%', padding: 8 }}
+        >
           <option value="">Select employee...</option>
           {employees.map(emp => (
             <option key={emp.id} value={emp.id}>{emp.full_name}</option>
@@ -124,7 +145,7 @@ export default function AnnualLeaveFormPage() {
             </div>
           </fieldset>
 
-          <fieldset style={{ border: '1px solid #ddd', padding: 16, marginBottom: 16 }}>
+          {/* <fieldset style={{ border: '1px solid #ddd', padding: 16, marginBottom: 16 }}>
             <legend>Leave year window</legend>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
@@ -136,9 +157,9 @@ export default function AnnualLeaveFormPage() {
                 <input type="date" value={leaveYearEnd} onChange={(e) => setLeaveYearEnd(e.target.value)} required />
               </div>
             </div>
-          </fieldset>
+          </fieldset> */}
 
-          <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Calculate & Save'}</button>
+          <button className="mb-4 bg-blue-500 text-white px-4 py-2 rounded" type="submit" disabled={loading}>{loading ? 'Saving...' : 'Calculate & Save'}</button>
         </form>
       ) : null}
     </div>

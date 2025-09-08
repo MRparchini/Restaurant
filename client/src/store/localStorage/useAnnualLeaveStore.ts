@@ -12,38 +12,44 @@ interface AnnualLeaveState {
   calculateAndSaveEntitlement: (params: {
     user_id: string;
     contract_id: string;
-    leave_year_start: string;
-    leave_year_end: string;
+    // leave_year_start: string;
+    // leave_year_end: string;
+  }) => Promise<AnnualLeaveEntitlement>;
+  calculateEntitlement: (params: {
+    user_id: string;
+    contract_id: string;
+    // leave_year_start: string;
+    // leave_year_end: string;
   }) => Promise<AnnualLeaveEntitlement>;
 }
 
-function calculateEntitlementDays(hoursPerWeek: number, daysPerWeek: number, leaveDaysInYearPortion: number) {
+function calculateEntitlementDays(_hoursPerWeek: number, daysPerWeek: number) {
   // Base UK entitlement for part-time: 5.6 weeks
   // Convert to days based on daysPerWeek
   const fullYearDays = 5.6 * daysPerWeek;
-  return +(fullYearDays * leaveDaysInYearPortion).toFixed(2);
+  return +(fullYearDays).toFixed(2);
 }
 
-function calculateEntitlementHours(hoursPerWeek: number, leaveWeeksPortion: number) {
+function calculateEntitlementHours(hoursPerWeek: number) {
   const fullYearHours = 5.6 * hoursPerWeek;
-  return +(fullYearHours * leaveWeeksPortion).toFixed(2);
+  return +(fullYearHours).toFixed(2);
 }
 
-function getYearPortion(startISO: string, endISO: string, leaveYearStartISO: string, leaveYearEndISO: string) {
-  const start = new Date(startISO);
-  const end = new Date(endISO);
-  const lyStart = new Date(leaveYearStartISO);
-  const lyEnd = new Date(leaveYearEndISO);
+// function getYearPortion(startISO: string, endISO: string, leaveYearStartISO: string, leaveYearEndISO: string) {
+//   const start = new Date(startISO);
+//   const end = new Date(endISO);
+//   const lyStart = new Date(leaveYearStartISO);
+//   const lyEnd = new Date(leaveYearEndISO);
 
-  const periodStart = start > lyStart ? start : lyStart;
-  const periodEnd = end < lyEnd ? end : lyEnd;
-  const totalMs = lyEnd.getTime() - lyStart.getTime();
-  const activeMs = Math.max(0, periodEnd.getTime() - periodStart.getTime());
-  const portion = totalMs > 0 ? activeMs / totalMs : 0;
-  return Math.min(1, Math.max(0, portion));
-}
+//   const periodStart = start > lyStart ? start : lyStart;
+//   const periodEnd = end < lyEnd ? end : lyEnd;
+//   const totalMs = lyEnd.getTime() - lyStart.getTime();
+//   const activeMs = Math.max(0, periodEnd.getTime() - periodStart.getTime());
+//   const portion = totalMs > 0 ? activeMs / totalMs : 0;
+//   return Math.min(1, Math.max(0, portion));
+// }
 
-export const useAnnualLeaveStore = create<AnnualLeaveState>((set, get) => ({
+export const useAnnualLeaveStore = create<AnnualLeaveState>((set) => ({
   contracts: [],
   entitlements: [],
   loading: false,
@@ -91,22 +97,22 @@ export const useAnnualLeaveStore = create<AnnualLeaveState>((set, get) => ({
     }
   },
 
-  calculateAndSaveEntitlement: async ({ user_id, contract_id, leave_year_start, leave_year_end }) => {
+  calculateAndSaveEntitlement: async ({ user_id, contract_id }) => {
     set({ loading: true, error: null });
     try {
       const contract = await dbManager.get<EmployeeContract>('employee_contracts', contract_id);
       if (!contract) throw new Error('Contract not found');
 
-      const portion = getYearPortion(contract.start_date, contract.end_date, leave_year_start, leave_year_end);
-      const entitlement_days = calculateEntitlementDays(contract.hours_per_week, contract.days_per_week, portion);
-      const entitlement_hours = calculateEntitlementHours(contract.hours_per_week, portion);
+      // const portion = getYearPortion(contract.start_date, contract.end_date, leave_year_start, leave_year_end);
+      const entitlement_days = calculateEntitlementDays(contract.hours_per_week, contract.days_per_week);
+      const entitlement_hours = calculateEntitlementHours(contract.hours_per_week);
 
       const result: AnnualLeaveEntitlement = {
         id: crypto.randomUUID(),
         user_id,
         contract_id,
-        leave_year_start,
-        leave_year_end,
+        // leave_year_start,
+        // leave_year_end,
         entitlement_hours,
         entitlement_days,
         calculation_basis: 'hours_per_week_5_6_pro_rata',
@@ -114,6 +120,36 @@ export const useAnnualLeaveStore = create<AnnualLeaveState>((set, get) => ({
       };
 
       await dbManager.add('annual_leave_entitlements', result);
+      set((state) => ({ entitlements: [result, ...state.entitlements], loading: false }));
+      return result;
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to calculate entitlement', loading: false });
+      throw err;
+    }
+  },
+  calculateEntitlement: async ({ user_id, contract_id }) => {
+    set({ loading: true, error: null });
+    try {
+      const contract = await dbManager.get<EmployeeContract>('employee_contracts', contract_id);
+      if (!contract) throw new Error('Contract not found');
+      
+      // const portion = getYearPortion(contract.start_date, contract.end_date, leave_year_start, leave_year_end);
+      // console.log(portion)
+      const entitlement_days = calculateEntitlementDays(contract.hours_per_week, contract.days_per_week);
+      const entitlement_hours = calculateEntitlementHours(contract.hours_per_week);
+      
+      const result: any = {
+        // id: crypto.randomUUID(),
+        user_id,
+        // contract_id,
+        // leave_year_start,
+        // leave_year_end,
+        entitlement_hours,
+        entitlement_days,
+        calculation_basis: 'hours_per_week_5_6_pro_rata',
+        // created_at: new Date().toISOString()
+      };
+      
       set((state) => ({ entitlements: [result, ...state.entitlements], loading: false }));
       return result;
     } catch (err) {

@@ -16,6 +16,7 @@ import ShiftsListPage from './pages/Shifts/ShiftsListPage';
 import WeeklyScheduleFormPage from './pages/WeeklySchedule/WeeklyScheduleFormPage';
 import './store/localStorage/dbUtils';
 import EmployeeFormPage from './pages/Employees/EmployeeFormPage';
+import AnnualLeaveFormPage from './pages/AnnualLeave/AnnualLeaveFormPage';
 
 const App: React.FC = () => {
   const [appLoaded, setAppLoaded] = useState(false)
@@ -33,7 +34,6 @@ const App: React.FC = () => {
       setAppLoaded(true)
     }, 500);
   }, [])
-  console.log("NNNN: ", currentUser)
   if(!appLoaded) {
     return <p>Loading ...</p>
   }
@@ -59,6 +59,7 @@ const App: React.FC = () => {
             <Route path="admin" element={<EmployeesPage />} />
             <Route path="employees" element={<EmployeesPage />} />
             <Route path="employees/add" element={<EmployeeFormPage />} />
+            <Route path="anuual-leaves" element={<AnnualLeaveFormPage />} />
           </Route>
         ) : (
           <Route path="*" element={<p>Shifts</p>} />

@@ -63,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               <Link to="/admin" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Employees</Link>
             </>
           )}
+          <Link to="/anuual-leaves" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Anuual Leaves</Link>
           <Link to="/leaves" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Leave Requests</Link>
         </nav>
 
