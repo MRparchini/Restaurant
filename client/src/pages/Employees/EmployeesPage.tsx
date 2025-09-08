@@ -1,9 +1,9 @@
 // src/pages/AdminPage.tsx
 import React, { useEffect } from 'react';
 import { Link } from 'react-router';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import useEmployeeStore from '../../store/useEmployeeStore';
 
-const AdminPage: React.FC = () => {
+const EmployeesPage: React.FC = () => {
   const { employees, fetchEmployees, loading, error, currentUser, deleteEmployee } = useEmployeeStore();
 
   useEffect(() => {
@@ -75,4 +75,4 @@ const AdminPage: React.FC = () => {
   );
 };
 
-export default AdminPage;
+export default EmployeesPage;

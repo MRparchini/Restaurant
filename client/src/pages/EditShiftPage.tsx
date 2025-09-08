@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { type Shift } from '../types';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
-import { useShiftStore } from '../store/localStorage/useShiftsStore';
+import useEmployeeStore from '../store/useEmployeeStore';
+import useShiftStore from '../store/useShiftsStore';
 
 const EditShiftPage = () => {
   const { id } = useParams<{ id: string }>();

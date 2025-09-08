@@ -1,10 +1,10 @@
 // src/components/ShiftsList.tsx
 import React, { useEffect, useState } from 'react';
-import { type ShiftTab } from '../types';
-import { useShiftStore } from '../store/localStorage/useShiftsStore';
+import { type ShiftTab } from '../../types';
+import useShiftStore from '../../store/useShiftsStore';
 import { addDays, startOfWeek } from 'date-fns';
 
-const ShiftsList: React.FC = () => {
+const ShiftsListPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ShiftTab>('today');
   const { fetchShifts, getShiftsByTab, loading, error } = useShiftStore();
 
@@ -69,4 +69,4 @@ const ShiftsList: React.FC = () => {
   );
 };
 
-export default ShiftsList;
+export default ShiftsListPage;

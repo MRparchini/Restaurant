@@ -1,9 +1,8 @@
 // src/store/useShiftStore.ts
 import { create } from 'zustand';
+import { supabase } from '../../api/supabase';
 import { type Shift, type WeeklySchedule } from '../../types';
-import { dbManager } from './indexedDB';
-// import { addDays, format, startOfWeek, isAfter } from 'date-fns';
-import { format, isAfter } from 'date-fns';
+import { addDays, format, startOfWeek, isAfter } from 'date-fns';
 
 interface ShiftState {
   shifts: Shift[];
@@ -16,6 +15,7 @@ interface ShiftState {
   deleteShift: (id: string) => Promise<void>;
   getShiftsByTab: (tab: 'today' | 'week' | 'upcoming') => Shift[];
 }
+
 
 const mockData = [
   {
@@ -84,22 +84,24 @@ const mockData = [
     "rota_hours": 0,
     "created_at": "2025-08-19T14:39:40.021015+00:00"
   }
-];
-
+]
 export const useShiftStore = create<ShiftState>((set, get) => ({
   shifts: mockData || [],
   loading: false,
   error: null,
 
-  fetchShifts: async (_startDate, _endDate) => {
+  fetchShifts: async (startDate, endDate) => {
     set({ loading: true, error: null });
     try {
-      const allShifts = await dbManager.getAll<Shift>('shifts');
-      const filteredShifts = allShifts
-      // .filter(shift => 
-      //   shift.shift_date >= startDate && shift.shift_date <= endDate
-      // );
-      set({ shifts: filteredShifts, loading: false });
+      const { data, error } = await supabase
+        .from('shifts')
+        .select('*')
+        .gte('shift_date', startDate)
+        .lte('shift_date', endDate)
+        .order('shift_date', { ascending: true });
+
+      if (error) throw error;
+      set({ shifts: data || [], loading: false });
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : 'Failed to fetch shifts',
@@ -111,15 +113,14 @@ export const useShiftStore = create<ShiftState>((set, get) => ({
   addShift: async (shift) => {
     set({ loading: true, error: null });
     try {
-      const newShift: Shift = {
-        ...shift,
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString()
-      };
-      
-      await dbManager.add('shifts', newShift);
+      const { data, error } = await supabase
+        .from('shifts')
+        .insert(shift)
+        .select();
+
+      if (error) throw error;
       set((state) => ({
-        shifts: [...state.shifts, newShift],
+        shifts: [...state.shifts, ...(data || [])],
         loading: false
       }));
     } catch (err) {
@@ -130,6 +131,7 @@ export const useShiftStore = create<ShiftState>((set, get) => ({
       throw err;
     }
   },
+// Updated addWeeklySchedule method in useShiftStore.ts
 addWeeklySchedule: async (schedule: WeeklySchedule) => {
   set({ loading: true, error: null });
   
@@ -144,30 +146,26 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
     const lastDate = weekDates[weekDates.length - 1];
 
     // 1. First delete all existing shifts for this user in this date range
-    const allShifts = await dbManager.getAll<Shift>('shifts');
-    const shiftsToDelete = allShifts.filter(shift => 
-      shift.user_id === schedule.user_id && 
-      shift.shift_date >= firstDate && 
-      shift.shift_date <= lastDate
-    );
-    
-    for (const shift of shiftsToDelete) {
-      await dbManager.delete('shifts', shift.id);
-    }
+    const { error: deleteError } = await supabase
+      .from('shifts')
+      .delete()
+      .eq('user_id', schedule.user_id)
+      .gte('shift_date', firstDate)
+      .lte('shift_date', lastDate);
+
+    if (deleteError) throw deleteError;
 
     // 2. Prepare all new shifts for insertion
     const shiftsToAdd = Object.entries(schedule.shifts)
       .filter(([_, shift]) => shift !== null)
       .map(([date, shift]) => ({
-        id: crypto.randomUUID(),
         user_id: schedule.user_id,
         user_name: schedule.user_name,
         shift_date: date,
         start_time: shift!.start_time,
         end_time: shift!.end_time,
-        position: schedule.position.toString(),
-        rota_hours: schedule.rota_hours,
-        created_at: new Date().toISOString()
+        position: schedule.position,
+        rota_hours: schedule.rota_hours
       }));
 
     // If no shifts to add (all empty), we're done
@@ -176,10 +174,13 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
       return;
     }
 
-    // 3. Insert all new shifts
-    for (const shift of shiftsToAdd) {
-      await dbManager.add('shifts', shift);
-    }
+    // 3. Insert all new shifts in a single operation
+    const { data, error: insertError } = await supabase
+      .from('shifts')
+      .insert(shiftsToAdd)
+      .select();
+
+    if (insertError) throw insertError;
 
     // 4. Update local state by removing deleted shifts and adding new ones
     set((state) => {
@@ -192,7 +193,7 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
       
       // Add the new shifts
       return {
-        shifts: [...filteredShifts, ...shiftsToAdd],
+        shifts: [...filteredShifts, ...(data || [])],
         loading: false
       };
     });
@@ -206,18 +207,18 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
     throw err;
   }
 },
-
   updateShift: async (id, updates) => {
     set({ loading: true, error: null });
     try {
-      const currentShift = get().shifts.find(s => s.id === id);
-      if (!currentShift) throw new Error('Shift not found');
-      
-      const updatedShift = { ...currentShift, ...updates };
-      await dbManager.update('shifts', updatedShift);
-      
+      const { error } = await supabase
+        .from('shifts')
+        .update(updates)
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
       set((state) => ({
-        shifts: state.shifts.map(s => s.id === id ? updatedShift : s),
+        shifts: state.shifts.map(s => s.id === id ? { ...s, ...updates } : s),
         loading: false
       }));
     } catch (err) {
@@ -232,7 +233,12 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
   deleteShift: async (id) => {
     set({ loading: true, error: null });
     try {
-      await dbManager.delete('shifts', id);
+      const { error } = await supabase
+        .from('shifts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
       set((state) => ({
         shifts: state.shifts.filter(s => s.id !== id),
         loading: false
@@ -254,13 +260,12 @@ addWeeklySchedule: async (schedule: WeeklySchedule) => {
       case 'today':
         return shifts.filter(s => s.shift_date === format(today, 'yyyy-MM-dd'));
       case 'week':
-        // const weekStart = startOfWeek(today);
-        // const weekEnd = addDays(weekStart, 6);
-        return shifts
-        // .filter(s => {
-        //   const shift_date = new Date(s.shift_date);
-        //   return shift_date >= weekStart && shift_date <= weekEnd;
-        // });
+        const weekStart = startOfWeek(today);
+        const weekEnd = addDays(weekStart, 6);
+        return shifts.filter(s => {
+          const shift_date = new Date(s.shift_date);
+          return shift_date >= weekStart && shift_date <= weekEnd;
+        });
       case 'upcoming':
         return shifts.filter(s => isAfter(new Date(s.shift_date), today));
       default:

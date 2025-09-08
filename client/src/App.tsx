@@ -1,21 +1,21 @@
 // src/App.tsx
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router';
+import './App.css';
 import Layout from './components/Layout';
-import LoginPage from './pages/LoginPage';
-import AdminPage from './pages/AdminPage';
-import ShiftsList from './components/ShiftsList';
-import WeeklyScheduleForm from './components/WeeklyScheduleForm';
-import EmployeeForm from './components/EmployeeForm';
-import LeaveRequestForm from './components/LeaveRequestForm';
-import { useEmployeeStore } from './store/localStorage/useEmployeeStore';
 import EditShiftPage from './pages/EditShiftPage';
-import './App.css'
+import LoginPage from './pages/LoginPage';
+import useEmployeeStore from './store/useEmployeeStore';
 import type { Employee } from './types';
 // Import seed data to initialize IndexedDB
 import './store/localStorage/seedData';
 // Import database utilities for debugging
+import EmployeesPage from './pages/Employees/EmployeesPage';
+import LeaveRequestFormPage from './pages/LeaveRequest/LeaveRequestFormPage';
+import ShiftsListPage from './pages/Shifts/ShiftsListPage';
+import WeeklyScheduleFormPage from './pages/WeeklySchedule/WeeklyScheduleFormPage';
 import './store/localStorage/dbUtils';
+import EmployeeFormPage from './pages/Employees/EmployeeFormPage';
 
 const App: React.FC = () => {
   const [appLoaded, setAppLoaded] = useState(false)
@@ -53,12 +53,12 @@ const App: React.FC = () => {
                 : <Navigate to="/shifts" />
             } />
             <Route path="shifts/edit/:id" element={<EditShiftPage />} />
-            <Route path="shifts" element={<ShiftsList />} />
-            <Route path="schedule" element={<WeeklyScheduleForm />} />
-            <Route path="leaves" element={<LeaveRequestForm />} />
-            <Route path="admin" element={<AdminPage />} />
-            <Route path="employees" element={<AdminPage />} />
-            <Route path="employees/add" element={<EmployeeForm />} />
+            <Route path="shifts" element={<ShiftsListPage />} />
+            <Route path="schedule" element={<WeeklyScheduleFormPage />} />
+            <Route path="leaves" element={<LeaveRequestFormPage />} />
+            <Route path="admin" element={<EmployeesPage />} />
+            <Route path="employees" element={<EmployeesPage />} />
+            <Route path="employees/add" element={<EmployeeFormPage />} />
           </Route>
         ) : (
           <Route path="*" element={<p>Shifts</p>} />

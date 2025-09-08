@@ -1,6 +1,6 @@
 // src/pages/LoginPage.tsx
 import React, { useState } from 'react';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import useEmployeeStore from '../store/useEmployeeStore';
 
 const LoginPage: React.FC = () => {
   const [credentials, setCredentials] = useState({

@@ -1,7 +1,7 @@
 // src/components/Layout.tsx
 import React, { useState } from 'react';
 import { Outlet } from 'react-router';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
+import useEmployeeStore from '../store/useEmployeeStore';
 import Sidebar from './Sidebar';
 
 const Layout: React.FC = () => {
