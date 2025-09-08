@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {currentUser?.role === 'admin' && (
             <>
               <Link to="/schedule" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Schedule</Link>
-              <Link to="/admin" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Admin</Link>
+              <Link to="/admin" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Employees</Link>
             </>
           )}
           <Link to="/leaves" onClick={onClose} className="block px-3 py-2 rounded hover:bg-gray-100">Leave Requests</Link>

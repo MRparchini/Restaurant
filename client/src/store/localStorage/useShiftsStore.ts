@@ -130,84 +130,82 @@ export const useShiftStore = create<ShiftState>((set, get) => ({
       throw err;
     }
   },
-
-  addWeeklySchedule: async (schedule: WeeklySchedule) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Get the week range from the schedule
-      const weekDates = Object.keys(schedule.shifts);
-      if (weekDates.length === 0) {
-        throw new Error('No dates in schedule');
-      }
-
-      const firstDate = weekDates[0];
-      const lastDate = weekDates[weekDates.length - 1];
-
-      // 1. First delete all existing shifts for this user in this date range
-      const allShifts = await dbManager.getAll<Shift>('shifts');
-      const shiftsToDelete = allShifts
-      // .filter(shift => 
-      //   shift.user_id === schedule.user_id && 
-      //   shift.shift_date >= firstDate && 
-      //   shift.shift_date <= lastDate
-      // );
-      
-      for (const shift of shiftsToDelete) {
-        await dbManager.delete('shifts', shift.id);
-      }
-
-      // 2. Prepare all new shifts for insertion
-      const shiftsToAdd = Object.entries(schedule.shifts)
-        .filter(([_, shift]) => shift !== null)
-        .map(([date, shift]) => ({
-          id: crypto.randomUUID(),
-          user_id: schedule.user_id,
-          user_name: schedule.user_name,
-          shift_date: date,
-          start_time: shift!.start_time,
-          end_time: shift!.end_time,
-          position: schedule.position.toString(),
-          rota_hours: schedule.rota_hours,
-          created_at: new Date().toISOString()
-        }));
-
-      // If no shifts to add (all empty), we're done
-      if (shiftsToAdd.length === 0) {
-        set({ loading: false });
-        return;
-      }
-
-      // 3. Insert all new shifts
-      for (const shift of shiftsToAdd) {
-        await dbManager.add('shifts', shift);
-      }
-
-      // 4. Update local state by removing deleted shifts and adding new ones
-      set((state) => {
-        // Remove any shifts for this user in the date range
-        const filteredShifts = state.shifts.filter(shift => 
-          !(shift.user_id === schedule.user_id && 
-            shift.shift_date >= firstDate && 
-            shift.shift_date <= lastDate)
-        );
-        
-        // Add the new shifts
-        return {
-          shifts: [...filteredShifts, ...shiftsToAdd],
-          loading: false
-        };
-      });
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save weekly schedule';
-      set({ 
-        error: errorMessage,
-        loading: false 
-      });
-      throw err;
+addWeeklySchedule: async (schedule: WeeklySchedule) => {
+  set({ loading: true, error: null });
+  
+  try {
+    // Get the week range from the schedule
+    const weekDates = Object.keys(schedule.shifts);
+    if (weekDates.length === 0) {
+      throw new Error('No dates in schedule');
     }
-  },
+
+    const firstDate = weekDates[0];
+    const lastDate = weekDates[weekDates.length - 1];
+
+    // 1. First delete all existing shifts for this user in this date range
+    const allShifts = await dbManager.getAll<Shift>('shifts');
+    const shiftsToDelete = allShifts.filter(shift => 
+      shift.user_id === schedule.user_id && 
+      shift.shift_date >= firstDate && 
+      shift.shift_date <= lastDate
+    );
+    
+    for (const shift of shiftsToDelete) {
+      await dbManager.delete('shifts', shift.id);
+    }
+
+    // 2. Prepare all new shifts for insertion
+    const shiftsToAdd = Object.entries(schedule.shifts)
+      .filter(([_, shift]) => shift !== null)
+      .map(([date, shift]) => ({
+        id: crypto.randomUUID(),
+        user_id: schedule.user_id,
+        user_name: schedule.user_name,
+        shift_date: date,
+        start_time: shift!.start_time,
+        end_time: shift!.end_time,
+        position: schedule.position.toString(),
+        rota_hours: schedule.rota_hours,
+        created_at: new Date().toISOString()
+      }));
+
+    // If no shifts to add (all empty), we're done
+    if (shiftsToAdd.length === 0) {
+      set({ loading: false });
+      return;
+    }
+
+    // 3. Insert all new shifts
+    for (const shift of shiftsToAdd) {
+      await dbManager.add('shifts', shift);
+    }
+
+    // 4. Update local state by removing deleted shifts and adding new ones
+    set((state) => {
+      // Remove any shifts for this user in the date range
+      const filteredShifts = state.shifts.filter(shift => 
+        !(shift.user_id === schedule.user_id && 
+          shift.shift_date >= firstDate && 
+          shift.shift_date <= lastDate)
+      );
+      
+      // Add the new shifts
+      return {
+        shifts: [...filteredShifts, ...shiftsToAdd],
+        loading: false
+      };
+    });
+
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Failed to save weekly schedule';
+    set({ 
+      error: errorMessage,
+      loading: false 
+    });
+    throw err;
+  }
+},
 
   updateShift: async (id, updates) => {
     set({ loading: true, error: null });

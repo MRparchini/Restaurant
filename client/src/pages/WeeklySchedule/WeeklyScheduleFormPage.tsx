@@ -1,12 +1,12 @@
 // src/components/WeeklyScheduleForm.tsx
 import React, { useState, useEffect } from 'react';
 import { format, addDays, startOfWeek, eachDayOfInterval } from 'date-fns';
-import { type WeeklySchedule } from '../types';
-import  useEmployeeStore from '../store/useEmployeeStore';
-import  useLeaveStore from '../store/useLeaveStore';
-import  useShiftStore from '../store/useShiftsStore';
+import { type WeeklySchedule } from '../../types';
+import  useEmployeeStore from '../../store/useEmployeeStore';
+import  useLeaveStore from '../../store/useLeaveStore';
+import  useShiftStore from '../../store/useShiftsStore';
 
-const WeeklyScheduleForm: React.FC = () => {
+const WeeklyScheduleFormPage: React.FC = () => {
   const { employees } = useEmployeeStore();
   const {shifts, addWeeklySchedule } = useShiftStore();
   const { leaves } = useLeaveStore();
@@ -239,4 +239,4 @@ const WeeklyScheduleForm: React.FC = () => {
   );
 };
 
-export default WeeklyScheduleForm;
+export default WeeklyScheduleFormPage;

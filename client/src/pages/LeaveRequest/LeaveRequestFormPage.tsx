@@ -1,10 +1,10 @@
 // src/components/LeaveRequestForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import useEmployeeStore from '../store/useEmployeeStore';
-import useLeaveStore from '../store/useLeaveStore';
+import useEmployeeStore from '../../store/useEmployeeStore';
+import useLeaveStore from '../../store/useLeaveStore';
 
-const LeaveRequestForm: React.FC = () => {
+const LeaveRequestFormPage: React.FC = () => {
   const { currentUser } = useEmployeeStore();
   const { addLeave } = useLeaveStore();
   const navigate = useNavigate();
@@ -87,4 +87,4 @@ const LeaveRequestForm: React.FC = () => {
   );
 };
 
-export default LeaveRequestForm;
+export default LeaveRequestFormPage;
