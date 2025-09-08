@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { format, addDays, startOfWeek, eachDayOfInterval } from 'date-fns';
 import { type WeeklySchedule } from '../types';
-import { useEmployeeStore } from '../store/localStorage/useEmployeeStore';
-import { useLeaveStore } from '../store/localStorage/useLeaveStore';
-import { useShiftStore } from '../store/localStorage/useShiftsStore';
+import { useEmployeeStore } from '../store/useEmployeeStore';
+import { useLeaveStore } from '../store/useLeaveStore';
+import { useShiftStore } from '../store/useShiftsStore';
 
 const WeeklyScheduleForm: React.FC = () => {
   const { employees } = useEmployeeStore();
@@ -233,6 +233,76 @@ const WeeklyScheduleForm: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <table className="min-w-full bg-white border">
+        <thead>
+          <tr>
+            <th className="border p-2">Employee</th>
+            {weekDays.map(day => (
+              <th key={day.toString()} className="border p-2">
+                {format(day, 'EEE MM/dd')}
+              </th>
+            ))}
+            <th className="border p-2">Rota Hours</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map((employee: any ) => (
+            <tr key={employee.id}>
+              <td className="border p-2">{employee.full_name}</td>
+              {weekDays.map(day => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const onLeave = isEmployeeOnLeave(employee.id, dateStr);
+                
+                return (
+                  <td key={dateStr} className={`border p-2 ${onLeave ? 'bg-red-100' : ''}`}>
+                    {onLeave ? (
+                      <div className="text-red-500">On Leave</div>
+                    ) : (
+                      <div className="space-y-2">
+                       <div className="timesWrapper">
+                         <input
+                          type="time"
+                          value={schedule[employee.id]?.shifts[dateStr]?.start_time || ''}
+                          onChange={(e) => handleShiftChange(employee.id, dateStr, 'start_time', e.target.value)}
+                          className="w-full p-1 border rounded"
+                        />
+                        <input
+                          type="time"
+                          value={schedule[employee.id]?.shifts[dateStr]?.end_time || ''}
+                          onChange={(e) => handleShiftChange(employee.id, dateStr, 'end_time', e.target.value)}
+                          className="w-full p-1 border rounded"
+                        />
+                       </div>
+                        <select
+                          value={schedule[employee.id]?.shifts[dateStr]?.position || ''}
+                          onChange={(e) => handleShiftChange(employee.id, dateStr, 'position', e.target.value)}
+                          className="w-full p-1 border rounded"
+                        >
+                          <option value="">Select Position</option>
+                          <option value="Manager">Manager</option>
+                          <option value="Cashier">Cashier</option>
+                          <option value="Barista">Barista</option>
+                        </select>
+                      </div>
+                    )}
+                  </td>
+                );
+              })}
+              <td className="border p-2">
+                <input
+                  type="number"
+                  value={rota_hours[employee.id] || 0}
+                  onChange={(e) => handlerota_hoursChange(employee.id, +e.target.value)}
+                  className="w-full p-1 border rounded"
+                  min="0"
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+</div>
+
     </div>
   );
 };
