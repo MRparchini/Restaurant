@@ -31,7 +31,11 @@ function calculateEntitlementDays(_hoursPerWeek: number, daysPerWeek: number) {
 }
 
 function calculateEntitlementHours(hoursPerWeek: number) {
-  const fullYearHours = 5.6 * hoursPerWeek;
+  // start_date: contract.start_date,
+  //       end_date: contract.end_date,
+  //       hours_per_week: contract.hours_per_week,
+  //       days_per_week: contract.days_per_week,
+ const fullYearHours = 5.6 * hoursPerWeek;
   return +(fullYearHours).toFixed(2);
 }
 

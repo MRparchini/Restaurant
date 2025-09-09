@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import useEmployeeStore from '../../store/useEmployeeStore';
 import useAnnualLeaveStore from '../../store/useAnnualLeaveStore';
+import { calcUKHolidayHours } from '../../store/localStorage/AnnualLeaveCalculationUtils';
 
 interface ContractForm {
   id?: string;
@@ -19,6 +20,7 @@ export default function AnnualLeaveFormPage() {
   // const [leaveYearStart, setLeaveYearStart] = useState<string>('');
   // const [leaveYearEnd, setLeaveYearEnd] = useState<string>('');
 
+  
   const [form, setForm] = useState<ContractForm>({
     user_id: '',
     start_date: '',
@@ -84,12 +86,19 @@ export default function AnnualLeaveFormPage() {
       days_per_week: form.days_per_week,
     });
 
-    const res = await calculateEntitlement({
-      user_id: selectedUserId,
-      contract_id: saved.id,
-      // leave_year_start: leaveYearStart,
-      // leave_year_end: leaveYearEnd,
-    });
+    // const res = await calculateEntitlement({
+    //   user_id: selectedUserId,
+    //   contract_id: saved.id,
+    //   // leave_year_start: leaveYearStart,
+    //   // leave_year_end: leaveYearEnd,
+    // });
+
+    const res = calcUKHolidayHours({
+      employmentStart: form.start_date,
+      employmentEnd: form.end_date,
+      weeklyHours: form.hours_per_week,
+      daysPerWeek: form.days_per_week,
+    })
     console.log("RES: ", res)
     return
     await calculateAndSaveEntitlement({
