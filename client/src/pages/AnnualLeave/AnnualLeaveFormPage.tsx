@@ -14,8 +14,8 @@ interface ContractForm {
 
 export default function AnnualLeaveFormPage() {
   const { employees, fetchEmployees } = useEmployeeStore();
-  const { fetchLatestContractByUser, upsertContract, calculateEntitlement, calculateAndSaveEntitlement, loading, error } = useAnnualLeaveStore();
-
+  const { fetchLatestContractByUser, calculateEntitlement, loading, error } = useAnnualLeaveStore();
+const [leaveHours, setLeaveHours] = useState<number>(0);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   // const [leaveYearStart, setLeaveYearStart] = useState<string>('');
   // const [leaveYearEnd, setLeaveYearEnd] = useState<string>('');
@@ -77,14 +77,14 @@ export default function AnnualLeaveFormPage() {
     if (!form.start_date || !form.end_date) return;
     // if (!leaveYearStart || !leaveYearEnd) return;
 
-    const saved = await upsertContract({
-      id: form.id,
-      user_id: selectedUserId,
-      start_date: form.start_date,
-      end_date: form.end_date,
-      hours_per_week: form.hours_per_week,
-      days_per_week: form.days_per_week,
-    });
+    // const saved = await upsertContract({
+    //   id: form.id,
+    //   user_id: selectedUserId,
+    //   start_date: form.start_date,
+    //   end_date: form.end_date,
+    //   hours_per_week: form.hours_per_week,
+    //   days_per_week: form.days_per_week,
+    // });
 
     // const res = await calculateEntitlement({
     //   user_id: selectedUserId,
@@ -93,22 +93,22 @@ export default function AnnualLeaveFormPage() {
     //   // leave_year_end: leaveYearEnd,
     // });
 
-    const res = calcUKHolidayHours({
+    const calculationResult = calcUKHolidayHours({
       employmentStart: form.start_date,
       employmentEnd: form.end_date,
       weeklyHours: form.hours_per_week,
       daysPerWeek: form.days_per_week,
     })
-    console.log("RES: ", res)
-    return
-    await calculateAndSaveEntitlement({
-      user_id: selectedUserId,
-      contract_id: saved.id,
-      // leave_year_start: leaveYearStart,
-      // leave_year_end: leaveYearEnd,
-    });
-    // Optionally show a toast or message; keeping it simple here
-    alert('Entitlement calculated and saved');
+    setLeaveHours(calculationResult)
+    // return
+    // await calculateAndSaveEntitlement({
+    //   user_id: selectedUserId,
+    //   contract_id: saved.id,
+    //   // leave_year_start: leaveYearStart,
+    //   // leave_year_end: leaveYearEnd,
+    // });
+    // // Optionally show a toast or message; keeping it simple here
+    // alert('Entitlement calculated and saved');
   };
 
   return (
@@ -168,7 +168,10 @@ export default function AnnualLeaveFormPage() {
             </div>
           </fieldset> */}
 
-          <button className="mb-4 bg-blue-500 text-white px-4 py-2 rounded" type="submit" disabled={loading}>{loading ? 'Saving...' : 'Calculate & Save'}</button>
+          <button className="mb-4 bg-blue-500 text-white px-4 py-2 rounded" type="submit" disabled={loading}>{loading ? 'Saving...' : 'Analis contract'}</button>
+          <hr/>
+          <h3>Leave hours: {leaveHours}</h3>
+          <button>Save</button>
         </form>
       ) : null}
     </div>

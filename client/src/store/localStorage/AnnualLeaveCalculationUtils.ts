@@ -233,7 +233,7 @@ export function calcUKHolidayHours(input: CalcInput): number {
     leaveYearStartMonth = 1,
     leaveYearStartDay = 1,
     rounding = 'nearest',
-    roundToMinutes = 30,
+    roundToMinutes = 16,
     contractualWeeksPerYear = 5.6,
     capDaysPerYear = 28,
   } = input;
